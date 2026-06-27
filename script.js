@@ -33,7 +33,7 @@ function slugify(value) {
 function getImage(path) {
   const value = cleanText(path);
 
-  if (!value) return "/assets/placeholder.png";
+  if (!value) return "/images/placeholder.png";
 
   if (value.startsWith("http")) return value;
   if (value.startsWith("/")) return value;
