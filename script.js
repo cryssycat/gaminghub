@@ -30,12 +30,93 @@ function slugify(value) {
     .replace(/^-|-$/g, "");
 }
 
+function looksLikeImagePath(value) {
+  const text = cleanText(value).toLowerCase();
+
+  return (
+    text.startsWith("http://") ||
+    text.startsWith("https://") ||
+    text.startsWith("/") ||
+    text.startsWith("./") ||
+    text.startsWith("../") ||
+    text.startsWith("images/") ||
+    text.startsWith("assets/") ||
+    /\.(png|jpg|jpeg|gif|webp|avif|svg)(\?.*)?$/.test(text)
+  );
+}
+
+function splitImageTitleAndPath(value) {
+  const text = cleanText(value);
+
+  if (!text) {
+    return {
+      url: "",
+      title: ""
+    };
+  }
+
+  // Supports StarHub-style formats:
+  // Title|/images/file.png
+  // /images/file.png|Title
+  // Title - /images/file.png
+  // Title — /images/file.png
+  // Title :: /images/file.png
+  const separators = ["|", "::", "—", "–"];
+
+  for (const separator of separators) {
+    if (!text.includes(separator)) continue;
+
+    const parts = text
+      .split(separator)
+      .map(part => part.trim())
+      .filter(Boolean);
+
+    if (parts.length < 2) continue;
+
+    const first = parts[0];
+    const second = parts.slice(1).join(separator).trim();
+
+    if (looksLikeImagePath(first)) {
+      return {
+        url: first,
+        title: second
+      };
+    }
+
+    if (looksLikeImagePath(second)) {
+      return {
+        url: second,
+        title: first
+      };
+    }
+  }
+
+  // Fallback: find the first image-looking token anywhere in the text.
+  const match = text.match(/(?:https?:\/\/\S+|\.{0,2}\/\S+|(?:images|assets)\/\S+|\S+\.(?:png|jpg|jpeg|gif|webp|avif|svg)(?:\?\S*)?)/i);
+
+  if (match) {
+    const url = match[0].trim();
+    const title = text.replace(url, "").replace(/[|:—–-]+$/g, "").trim();
+
+    return {
+      url,
+      title
+    };
+  }
+
+  return {
+    url: text,
+    title: ""
+  };
+}
+
 function getImage(path) {
-  const value = cleanText(path);
+  const parsed = splitImageTitleAndPath(path);
+  const value = cleanText(parsed.url || path);
 
   if (!value) return "/images/placeholder.png";
 
-  if (value.startsWith("http")) return value;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
   if (value.startsWith("/")) return value;
 
   return `/${value.replace(/^\.?\//, "")}`;
@@ -45,13 +126,41 @@ function normalizeImageItem(item) {
   if (!item) return null;
 
   if (typeof item === "string") {
-    return { url: item, title: "" };
+    return splitImageTitleAndPath(item);
   }
 
+  const rawUrl =
+    item.url ||
+    item.src ||
+    item.image ||
+    item.file ||
+    item.path ||
+    item.href ||
+    "";
+
+  const parsed = splitImageTitleAndPath(rawUrl);
+
   return {
-    url: item.url || item.src || item.image || item.file || "",
-    title: item.title || item.label || item.name || ""
+    url: parsed.url,
+    title: item.title || item.label || item.name || parsed.title || ""
   };
+}
+
+function getCharacterPortrait(character) {
+  const raw =
+    character.portrait ||
+    character.Portrait ||
+    character.image ||
+    character.Image ||
+    character.icon ||
+    character.Icon ||
+    character.mainRef ||
+    character["Main Ref"] ||
+    "";
+
+  const item = normalizeImageItem(raw);
+
+  return item?.url || raw || "";
 }
 
 async function fetchCharacters() {
@@ -103,7 +212,7 @@ function renderHub() {
 
   filtered.forEach(character => {
     const slug = character.slug || slugify(character.name);
-    const img = getImage(character.portrait || character.image || character.icon);
+    const img = getImage(getCharacterPortrait(character));
 
     const card = document.createElement("a");
     card.className = "character-card";
@@ -246,7 +355,7 @@ function renderProfile(character) {
   setText("characterName", character.name, "Unnamed");
   setText("gameLabel", character.game, "Unknown game");
 
-  setImage("portraitImage", character.portrait || character.image || character.icon);
+  setImage("portraitImage", getCharacterPortrait(character));
 
   setText("factName", character.name);
   setText("factAge", character.age);
