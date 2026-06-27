@@ -294,6 +294,7 @@ function setupProfileTabs(character) {
   setProfileTabVisible("gallery", Array.isArray(character.gallery) && character.gallery.length > 0);
   setProfileTabVisible("nsfw", Array.isArray(character.nsfwGallery) && character.nsfwGallery.length > 0);
   setProfileTabVisible("screenshots", Array.isArray(character.dumbScreenshots) && character.dumbScreenshots.length > 0);
+  setProfileTabVisible("closet", Array.isArray(character.closet) && character.closet.length > 0);
 }
 
 function setProfileTabVisible(tab, visible) {
@@ -366,6 +367,7 @@ function renderProfile(character) {
   renderImages("galleryGrid", character.gallery, false);
   renderImages("nsfwGrid", character.nsfwGallery, true);
   renderImages("screenshotsGrid", character.dumbScreenshots, false);
+  renderImages("closetGrid", character.closet, false);
 
   setupProfileTabs(character);
 }
