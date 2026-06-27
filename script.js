@@ -46,94 +46,29 @@ function looksLikeImagePath(value) {
 }
 
 function splitImageTitleAndPath(value) {
-    const text = cleanText(value);
+  const text = cleanText(value);
 
-    if (!text) {
-        return {
-            title: "",
-            url: ""
-        };
-    }
-
-    const parts = text.split("|").map(v => v.trim());
-
-    if (parts.length === 1) {
-        return {
-            title: "",
-            url: parts[0]
-        };
-    }
-
-    const first = parts[0];
-    const second = parts.slice(1).join("|");
-
-    if (looksLikeImagePath(first)) {
-        return {
-            url: first,
-            title: second
-        };
-    }
-
-    return {
-        title: first,
-        url: second
-    };
-}
+  if (!text) {
+    return { title: "", url: "" };
   }
 
-  // Supports StarHub-style formats:
-  // Title|/images/file.png
-  // /images/file.png|Title
-  // Title - /images/file.png
-  // Title — /images/file.png
-  // Title :: /images/file.png
-  const separators = ["|", "::", "—", "–"];
+  // Preferred StarHub/GameHub format:
+  // Title|images/My File With Spaces.png
+  // images/My File With Spaces.png|Title
+  const parts = text.split("|").map(part => part.trim());
 
-  for (const separator of separators) {
-    if (!text.includes(separator)) continue;
-
-    const parts = text
-      .split(separator)
-      .map(part => part.trim())
-      .filter(Boolean);
-
-    if (parts.length < 2) continue;
-
-    const first = parts[0];
-    const second = parts.slice(1).join(separator).trim();
-
-    if (looksLikeImagePath(first)) {
-      return {
-        url: first,
-        title: second
-      };
-    }
-
-    if (looksLikeImagePath(second)) {
-      return {
-        url: second,
-        title: first
-      };
-    }
+  if (parts.length === 1) {
+    return { title: "", url: parts[0] };
   }
 
-  // Fallback: find the first image-looking token anywhere in the text.
-  const match = text.match(/(?:https?:\/\/\S+|\.{0,2}\/\S+|(?:images|assets)\/\S+|\S+\.(?:png|jpg|jpeg|gif|webp|avif|svg)(?:\?\S*)?)/i);
+  const first = parts[0];
+  const second = parts.slice(1).join("|").trim();
 
-  if (match) {
-    const url = match[0].trim();
-    const title = text.replace(url, "").replace(/[|:—–-]+$/g, "").trim();
-
-    return {
-      url,
-      title
-    };
+  if (looksLikeImagePath(first)) {
+    return { url: first, title: second };
   }
 
-  return {
-    url: text,
-    title: ""
-  };
+  return { title: first, url: second };
 }
 
 function getImage(path) {
@@ -142,10 +77,10 @@ function getImage(path) {
 
   if (!value) return "/images/placeholder.png";
 
-  if (value.startsWith("http://") || value.startsWith("https://")) return value;
-  if (value.startsWith("/")) return value;
+  if (value.startsWith("http://") || value.startsWith("https://")) return encodeURI(value);
+  if (value.startsWith("/")) return encodeURI(value);
 
-  return `/${value.replace(/^\.?\//, "")}`;
+  return encodeURI(`/${value.replace(/^\.?\//, "")}`);
 }
 
 function normalizeImageItem(item) {
