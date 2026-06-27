@@ -1,4 +1,4 @@
-const API_URL = "starbrewgaming.crysthigpen.workers.dev";
+const API_URL = "gamehub.crysthigpen.workers.dev";
 
 let allCharacters = [];
 let activeOwner = "Luna";
