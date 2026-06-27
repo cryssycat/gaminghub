@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Character Hub</title>
+<link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="back-link" href="https://characterhub.pages.dev/">← Back to StarHub</a>
+  <p class="eyebrow">Starbrew</p>
+  <h1>Game Character Hub</h1>
+  <p class="subtitle">A separate home for Luna and Star's video game characters.</p>
+</header>
+
+<main class="hub-shell">
+  <nav class="owner-tabs" aria-label="Character owner tabs">
+    <button class="owner-tab active" data-owner="Luna">🌙 Luna's Characters</button>
+    <button class="owner-tab" data-owner="Star">⭐ Star's Characters</button>
+  </nav>
+
+  <section class="toolbar glass-card">
+    <input id="searchInput" type="search" placeholder="Search by name, game, race, or partner...">
+  </section>
+
+  <section id="statusMessage" class="status-message">Loading characters...</section>
+
+  <section id="characterGrid" class="character-grid"></section>
+</main>
+
+<script src="script.js?v=1"></script>
+</body>
+</html>

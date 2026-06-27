@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Character | GameHub</title>
+<link rel="stylesheet" href="../style.css?v=1">
+</head>
+<body>
+
+<header class="character-header">
+  <a class="back-link" href="../index.html">← Back to GameHub</a>
+  <p id="ownerLabel" class="eyebrow">Game Character</p>
+  <h1 id="characterName">Loading...</h1>
+  <p id="gameLabel" class="subtitle">Loading character...</p>
+</header>
+
+<main class="profile-shell">
+  <nav class="profile-tabs" aria-label="Profile tabs">
+    <button class="profile-tab active" data-tab="overview">Overview</button>
+    <button class="profile-tab" data-tab="gallery">Gallery</button>
+    <button class="profile-tab" data-tab="nsfw">🔞 NSFW Gallery</button>
+    <button class="profile-tab" data-tab="screenshots">Dumb Screenshots</button>
+  </nav>
+
+  <section id="overview" class="tab-panel active">
+    <div class="overview-grid">
+      <div class="glass-card portrait-card">
+        <img id="portraitImage" src="../assets/placeholder.png" alt="Character portrait">
+      </div>
+
+      <div class="glass-card facts-card">
+        <h2>Quick Facts</h2>
+        <p><strong>Name:</strong> <span id="factName">—</span></p>
+        <p><strong>Age:</strong> <span id="factAge">—</span></p>
+        <p><strong>Race:</strong> <span id="factRace">—</span></p>
+        <p><strong>Partner:</strong> <span id="factPartner">—</span></p>
+        <p><strong>Game:</strong> <span id="factGame">—</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery" class="tab-panel">
+    <div class="section-title">
+      <h2>Gallery</h2>
+      <p>Artwork, portraits, and favorite images.</p>
+    </div>
+    <div id="galleryGrid" class="image-grid"></div>
+  </section>
+
+  <section id="nsfw" class="tab-panel">
+    <div class="section-title">
+      <h2>NSFW Gallery</h2>
+      <p>Images are blurred until revealed.</p>
+    </div>
+    <div id="nsfwGrid" class="image-grid"></div>
+  </section>
+
+  <section id="screenshots" class="tab-panel">
+    <div class="section-title">
+      <h2>Dumb Screenshots Gallery</h2>
+      <p>Silly screenshots, cursed moments, and memorable game chaos.</p>
+    </div>
+    <div id="screenshotsGrid" class="image-grid"></div>
+  </section>
+</main>
+
+<div id="lightbox" class="lightbox">
+  <button id="lightboxClose" class="lightbox-close">×</button>
+  <img id="lightboxImage" src="" alt="Full-size image">
+</div>
+
+<script src="../script.js?v=1"></script>
+</body>
+</html>
