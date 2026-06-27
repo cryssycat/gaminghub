@@ -32,7 +32,7 @@ function slugify(value) {
 
 function getImage(path) {
   const value = cleanText(path);
-  if (!value) return "../assets/placeholder.png";
+  if (!value) return "../images/placeholder.png";
   if (value.startsWith("http")) return value;
   if (value.startsWith("/")) return value;
   return value;
@@ -163,7 +163,7 @@ function setText(id, value, fallback = "—") {
 function setImage(id, src) {
   const img = document.getElementById(id);
   if (!img) return;
-  img.src = getImage(src || "../assets/placeholder.png");
+  img.src = getImage(src || "../images/placeholder.png");
 }
 
 function setupProfileTabs(character) {
