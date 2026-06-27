@@ -46,13 +46,39 @@ function looksLikeImagePath(value) {
 }
 
 function splitImageTitleAndPath(value) {
-  const text = cleanText(value);
+    const text = cleanText(value);
 
-  if (!text) {
+    if (!text) {
+        return {
+            title: "",
+            url: ""
+        };
+    }
+
+    const parts = text.split("|").map(v => v.trim());
+
+    if (parts.length === 1) {
+        return {
+            title: "",
+            url: parts[0]
+        };
+    }
+
+    const first = parts[0];
+    const second = parts.slice(1).join("|");
+
+    if (looksLikeImagePath(first)) {
+        return {
+            url: first,
+            title: second
+        };
+    }
+
     return {
-      url: "",
-      title: ""
+        title: first,
+        url: second
     };
+}
   }
 
   // Supports StarHub-style formats:
