@@ -370,3 +370,57 @@ button:hover {
     width: min(94vw, 680px);
   }
 }
+
+
+/*==========================================
+  CHARACTER PROFILE LINK
+==========================================*/
+
+.profile-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+
+    margin-top:24px;
+    padding:14px 22px;
+
+    border-radius:999px;
+
+    text-decoration:none;
+    font-weight:700;
+    font-size:0.95rem;
+    letter-spacing:.02em;
+
+    color:var(--text);
+
+    background:var(--glass-strong);
+    border:1px solid var(--line);
+
+    box-shadow:0 10px 28px rgba(55,64,78,.12);
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        color .18s ease;
+}
+
+.profile-button:hover{
+    transform:translateY(-2px);
+
+    background:rgba(255,255,255,.82);
+
+    color:var(--accent);
+
+    box-shadow:0 18px 42px rgba(55,64,78,.18);
+}
+
+.profile-button:active{
+    transform:translateY(0);
+}
+
+.profile-button::before{
+    content:"⭐";
+    font-size:1rem;
+}
