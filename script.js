@@ -1,5 +1,40 @@
 const API_URL = "https://gamehub.crysthigpen.workers.dev/";
 
+
+const CHARACTER_HUBS = {
+    StarHub: "https://characterhub.pages.dev",
+    LunaHub: "https://lunabrew.pages.dev",
+    SharedHub: "https://starbrewshared.pages.dev"
+};
+
+
+function normalizeCharacterHub(value) {
+
+    const hub = cleanText(value).toLowerCase();
+
+    if (hub === "starhub" || hub === "star") return "StarHub";
+    if (hub === "lunahub" || hub === "luna") return "LunaHub";
+    if (
+        hub === "sharedhub" ||
+        hub === "shared" ||
+        hub === "starbrewshared"
+    ) return "SharedHub";
+
+    return "";
+}
+
+function getCharacterProfileURL(character) {
+
+    const hub = normalizeCharacterHub(character.characterHub);
+
+    const slug = cleanText(character.characterSlug);
+
+    if (!hub || !slug) return "";
+
+    return `${CHARACTER_HUBS[hub]}/characters/?slug=${encodeURIComponent(slug)}`;
+
+}
+
 let allCharacters = [];
 let activeOwner = "Luna";
 
@@ -324,7 +359,26 @@ function renderProfile(character) {
   setText("factRace", character.race);
   setText("factPartner", character.partner);
   setText("factGame", character.game);
+  
+const profileButton = document.getElementById("characterHubLink");
 
+if (profileButton) {
+
+    const url = getCharacterProfileURL(character);
+
+    if (url) {
+
+        profileButton.href = url;
+        profileButton.style.display = "";
+
+    } else {
+
+        profileButton.style.display = "none";
+
+    }
+
+}
+  
   renderImages("galleryGrid", character.gallery, false);
   renderImages("nsfwGrid", character.nsfwGallery, true);
   renderImages("screenshotsGrid", character.dumbScreenshots, false);
