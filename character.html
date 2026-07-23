@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>velle ymir. — the hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<style>
+  :root{
+    --bg: #e9e2e6;
+    --panel: #f7f2f4;
+    --panel-alt: #efe6ea;
+    --ink: #453342;
+    --muted: #8c7986;
+    --accent: #a4647c;
+    --accent-deep: #5c3448;
+    --tag-bg: #e3d6dc;
+    --border: #ddccd4;
+    --shadow: rgba(69, 51, 66, 0.14);
+    --radius: 14px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family:'Jost', sans-serif;
+    font-weight:300;
+    line-height:1.6;
+  }
+
+  .crescent{
+    display:inline-block;
+    width:0.7em; height:0.7em;
+    vertical-align:-0.05em;
+    opacity:0.7;
+  }
+
+  /* ---------- Header / Banner ---------- */
+  .hero{
+    position:relative;
+    height:clamp(260px, 40vw, 420px);
+    background-size:cover;
+    background-position:center;
+    background-color:#3c2e3d;
+    display:flex; align-items:flex-end;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(28,20,28,0.05) 0%, rgba(28,20,28,0.55) 100%);
+  }
+  .hero-inner{
+    position:relative; z-index:1;
+    width:100%;
+    max-width:1100px;
+    margin:0 auto;
+    padding: 0 32px 28px;
+    color:#f7f2f4;
+  }
+  .hero-eyebrow{
+    font-size:0.8rem;
+    letter-spacing:0.14em;
+    text-transform:lowercase;
+    opacity:0.85;
+    margin-bottom:4px;
+  }
+  .hero-title{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(2.2rem, 5vw, 3.4rem);
+    margin:0;
+  }
+
+  .back-link{
+    display:inline-block;
+    font-size:0.8rem;
+    color:#f0e8ec;
+    background: rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.35);
+    padding:5px 14px;
+    border-radius:20px;
+    text-decoration:none;
+    margin-bottom:14px;
+    backdrop-filter: blur(2px);
+  }
+  .back-link:hover{ background: rgba(255,255,255,0.24); }
+
+  /* ---------- Tabs ---------- */
+  .tabbar{
+    position:sticky; top:0; z-index:10;
+    background: var(--panel);
+    border-bottom:1px solid var(--border);
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .tabbar-inner{
+    max-width:1100px; margin:0 auto;
+    display:flex; gap:4px;
+    padding: 0 24px;
+  }
+  .tab-btn{
+    appearance:none; border:none; background:none;
+    font-family:'Jost', sans-serif;
+    font-size:0.92rem;
+    letter-spacing:0.04em;
+    color: var(--muted);
+    padding:16px 18px 13px;
+    cursor:pointer;
+    position:relative;
+    transition:color 0.2s ease;
+  }
+  .tab-btn:hover{ color: var(--accent-deep); }
+  .tab-btn.active{ color: var(--accent-deep); font-weight:500; }
+  .tab-btn.active::after{
+    content:"☾";
+    position:absolute; left:50%; bottom:2px;
+    transform:translateX(-50%);
+    font-size:0.7rem;
+    color: var(--accent);
+  }
+
+  /* ---------- Layout shells ---------- */
+  main{ max-width:1100px; margin:0 auto; padding: 40px 24px 80px; }
+  .tab-panel{ display:none; animation: fade 0.35s ease; }
+  .tab-panel.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .section-heading{
+    display:flex; align-items:center; gap:12px;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-weight:500;
+    font-size:1.7rem;
+    color: var(--accent-deep);
+    margin: 46px 0 18px;
+  }
+  .section-heading:first-child{ margin-top:0; }
+  .section-heading .rule{
+    flex:1; height:1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .card{
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+  }
+
+  .tag{
+    display:inline-block;
+    background: var(--tag-bg);
+    color: var(--accent-deep);
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    text-transform:lowercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-right:6px;
+  }
+
+  /* ---------- Profile tab ---------- */
+  .profile-top{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap: 28px;
+    align-items:start;
+  }
+  .profile-photo-wrap img{
+    width:100%; border-radius: var(--radius);
+    border:1px solid var(--border);
+    box-shadow: 0 8px 20px var(--shadow);
+    display:block;
+  }
+  .stat-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 22px;
+  }
+  .stat{
+    display:flex; flex-direction:column; gap:3px;
+    border-bottom:1px dashed var(--border);
+    padding-bottom:8px;
+  }
+  .stat .label{
+    font-size:0.68rem; letter-spacing:0.08em; text-transform:lowercase;
+    color: var(--muted);
+  }
+  .stat .value{ font-size:0.95rem; }
+
+  .prose{ font-size:0.98rem; color:#4d3a48; }
+
+  .taglist-row{ margin-top:14px; }
+  .taglist-row .label{
+    font-size:0.68rem; letter-spacing:0.08em; text-transform:lowercase;
+    color: var(--muted); display:block; margin-bottom:6px;
+  }
+
+  .gallery{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .gallery img{
+    width:100%; height:220px; object-fit:cover;
+    border-radius: var(--radius);
+    border:1px solid var(--border);
+  }
+
+  .trio{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
+  }
+  .trio .card .label{
+    font-size:0.68rem; letter-spacing:0.08em; text-transform:lowercase;
+    color: var(--accent); display:block; margin-bottom:6px;
+  }
+
+  /* ---------- Relationships tab ---------- */
+  .rel-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .rel-card{
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    overflow:hidden;
+    cursor:pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .rel-card:hover{ transform: translateY(-3px); box-shadow: 0 10px 22px var(--shadow); }
+  .rel-card img{
+    width:100%; height:200px; object-fit:cover;
+    background: var(--panel-alt);
+  }
+  .rel-card .rel-body{ padding: 14px 16px 18px; }
+  .rel-card .rel-name{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-weight:500;
+    font-size:1.15rem; color: var(--accent-deep);
+  }
+  .rel-card .rel-pronouns{ font-size:0.78rem; color: var(--muted); margin-left:6px; }
+  .rel-card .rel-desc{
+    font-size:0.86rem; color:#5a4854; margin-top:8px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+
+  /* Modal */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(28,20,28,0.55);
+    display:none; align-items:center; justify-content:center;
+    padding:24px; z-index:100;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal{
+    background: var(--panel);
+    border-radius: var(--radius);
+    max-width:480px; width:100%;
+    padding: 26px 28px;
+    position:relative;
+    box-shadow: 0 20px 50px rgba(28,20,28,0.35);
+  }
+  .modal img{
+    width:100%; height:240px; object-fit:cover;
+    border-radius: 10px; margin-bottom:16px;
+  }
+  .modal .modal-close{
+    position:absolute; top:14px; right:16px;
+    background:none; border:none; cursor:pointer;
+    font-size:1.1rem; color: var(--muted);
+  }
+  .modal .rel-name{ font-size:1.4rem; }
+  .modal .modal-desc{ margin-top:10px; font-size:0.95rem; }
+  .modal .modal-link{
+    display:inline-block; margin-top:16px;
+    font-size:0.82rem; letter-spacing:0.04em;
+    color:#fff; background: var(--accent-deep);
+    padding:9px 16px; border-radius:20px; text-decoration:none;
+  }
+
+  /* ---------- Rules tab ---------- */
+ .contact-card{
+    display:flex;
+    gap:24px;
+    align-items:flex-start;
+}
+
+.contact-card img{
+    width:150px; border-radius: var(--radius);
+    border:1px solid var(--border);
+  }
+
+.contact-card > div{
+    flex:1;
+}
+  
+  .contact-stats{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; margin-bottom:14px;
+  }
+  .intro-text{
+    background: var(--panel-alt);
+    border-left:3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 10px 10px 0;
+    font-size:0.92rem;
+  }
+
+  .rules-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .rule-card .rule-title{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-weight:500;
+    font-size:1.1rem; color: var(--accent-deep);
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:8px;
+  }
+  .rule-card .rule-body{ font-size:0.9rem; color:#5a4854; }
+  /* Markdown elements inside a rendered rule body */
+  .rule-body h1, .rule-body h2, .rule-body h3{
+    font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:500;
+    color: var(--accent-deep); margin:0.6em 0 0.3em;
+  }
+  .rule-body p{ margin:0 0 0.7em; }
+  .rule-body p:last-child{ margin-bottom:0; }
+  .rule-body ul, .rule-body ol{ margin:0 0 0.7em; padding-left:1.3em; }
+  .rule-body li{ margin-bottom:0.25em; }
+  .rule-body a{ color: var(--accent-deep); }
+  .rule-body strong{ color: var(--accent-deep); }
+  .rule-body code{
+    background: var(--panel-alt); border-radius:4px;
+    padding:1px 5px; font-size:0.85em;
+  }
+  .rule-body blockquote{
+    margin:0 0 0.7em; padding-left:12px;
+    border-left:3px solid var(--accent);
+    color: var(--muted);
+  }
+
+  /* ---------- Gallery tabs ---------- */
+  .gallery-figure{ position:relative; }
+  .gallery-figure img{
+    width:100%; height:220px; object-fit:cover;
+    border-radius: var(--radius);
+    border:1px solid var(--border);
+    cursor:pointer;
+    display:block;
+  }
+  .gallery-caption{
+    font-size:0.8rem; color: var(--muted);
+    margin-top:6px; text-align:center;
+  }
+  .gallery-gate{
+    background: var(--panel);
+    border:1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 50px 24px;
+    text-align:center;
+  }
+  .gallery-gate .gate-title{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic; font-weight:500;
+    font-size:1.4rem; color: var(--accent-deep);
+    margin-bottom:8px;
+  }
+  .gallery-gate .gate-note{ color: var(--muted); font-size:0.9rem; margin-bottom:18px; }
+  .gate-btn{
+    appearance:none; cursor:pointer; border:none;
+    background: var(--accent-deep); color:#fff;
+    font-family:'Jost', sans-serif; font-size:0.9rem;
+    padding:10px 22px; border-radius:20px;
+  }
+  .modal img.lightbox-img{ height:auto; max-height:70vh; object-fit:contain; }
+
+  /* ---------- Loading / empty ---------- */
+  .loading-msg, .error-msg{
+    text-align:center; padding:60px 20px; color: var(--muted);
+    font-family:'Cormorant Garamond', serif; font-style:italic; font-size:1.2rem;
+  }
+
+  @media (max-width: 720px){
+    .profile-top{ grid-template-columns: 1fr; }
+    .gallery{ grid-template-columns: 1fr 1fr; }
+    .trio{ grid-template-columns: 1fr; }
+    .stat-grid{ grid-template-columns: 1fr; }
+    .contact-card{ grid-template-columns: 1fr; }
+    .contact-card img{ max-width:150px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero" id="hero">
+  <div class="hero-inner">
+    <a class="back-link" id="back-link" href="hub.html">← back to hub</a>
+    <div class="hero-eyebrow">☾ the hub</div>
+    <h1 class="hero-title" id="hero-title">the hub.</h1>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <div class="tabbar-inner" id="tabbar-inner"></div>
+</nav>
+
+<main id="app">
+  <div class="loading-msg">gathering the pages... ☾</div>
+</main>
+
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modal-close">✕ close</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+  // ---- CONFIG: replace with your deployed worker URL ----
+const API_BASE = "https://testinggroundssb.crysthigpen.workers.dev";
+
+  const app = document.getElementById('app');
+  const hero = document.getElementById('hero');
+  const heroTitle = document.getElementById('hero-title');
+  const backLink = document.getElementById('back-link');
+  const tabbarInner = document.getElementById('tabbar-inner');
+
+  let activeTab = 'profile';
+  const revealedGalleries = new Set();
+
+  function esc(str){
+    if(str === undefined || str === null || str === '') return '';
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function val(v, fallback){
+    return (v === undefined || v === null || v === '') ? (fallback ?? '—') : v;
+  }
+
+  async function loadHub(){
+    const params = new URLSearchParams(location.search);
+    const requestedSlug = params.get('c');
+    const owner = params.get('owner');
+
+    // Preserve the owner tab when heading back to the hub grid.
+    backLink.href = owner ? `hub.html?owner=${encodeURIComponent(owner)}` : 'hub.html';
+
+    try{
+      const res = await fetch(`${API_BASE}/api/hub`);
+      if(!res.ok) throw new Error(`Request failed (${res.status})`);
+      const data = await res.json();
+      const characters = data.characters || [];
+      if(!characters.length){
+        app.innerHTML = `<div class="loading-msg">no characters added yet.</div>`;
+        return;
+      }
+      const character = characters.find(c => c.slug === requestedSlug) || characters[0];
+      render(character);
+    }catch(err){
+      app.innerHTML = `<div class="error-msg">the pages wouldn't load.<br><small style="font-family:Jost; font-style:normal;">${esc(err.message)}</small></div>`;
+    }
+  }
+
+  function render(character){
+    const p = character.profile || {};
+    const relationships = character.relationships || [];
+    const rules = character.rules || [];
+    const galleries = (character.galleries || []).filter(g => g.images && g.images.length);
+
+    hero.style.backgroundImage = p.banner_image ? `url('${p.banner_image}')` : 'none';
+    heroTitle.textContent = val(p.name, 'the profile') + '.';
+
+    // Build the tab list: profile, relationships, one tab per populated
+    // gallery (in the order the API returns them), then rules.
+    const hasRelationships = relationships.length > 0;
+    const hasRules = rules.length > 0;
+    const hasHooks = String(p.hooks || '').trim().length > 0;
+
+    const tabs = [{ key: 'profile', label: 'profile' }];
+    if (hasRelationships) tabs.push({ key: 'relationships', label: 'relationships' });
+    tabs.push(...galleries.map(g => ({ key: `gallery:${g.name}`, label: g.name.toLowerCase() })));
+    if (hasRules) tabs.push({ key: 'rules', label: 'rules' });
+    if (hasHooks) tabs.push({ key: 'hooks', label: 'hooks' });
+
+    if (!tabs.some(t => t.key === activeTab)) activeTab = 'profile';
+
+    tabbarInner.innerHTML = tabs.map(t =>
+      `<button class="tab-btn${t.key === activeTab ? ' active' : ''}" data-tab="${esc(t.key)}">${esc(t.label)}</button>`
+    ).join('');
+    tabbarInner.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTab = btn.dataset.tab;
+        tabbarInner.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.tab-panel').forEach(pnl => pnl.classList.toggle('active', pnl.id === `panel-${cssSafe(activeTab)}`));
+        window.scrollTo({top: 0, behavior:'smooth'});
+      });
+    });
+
+    app.innerHTML = `
+      <section class="tab-panel" id="panel-profile">${renderProfile(p)}</section>
+      ${hasRelationships ? `<section class="tab-panel" id="panel-relationships">${renderRelationships(relationships)}</section>` : ''}
+      ${galleries.map(g => `<section class="tab-panel" id="panel-${cssSafe(`gallery:${g.name}`)}">${renderGallery(g)}</section>`).join('')}
+      ${hasRules ? `<section class="tab-panel" id="panel-rules">${renderRules(p, rules)}</section>` : ''}
+      ${hasHooks ? `<section class="tab-panel" id="panel-hooks">${renderHooks(p)}</section>` : ''}
+    `;
+
+    document.querySelectorAll('.tab-panel').forEach(pnl => pnl.classList.toggle('active', pnl.id === `panel-${cssSafe(activeTab)}`));
+
+    wireRelationshipCards(relationships);
+    wireGalleries(galleries);
+  }
+
+  // Turns a tab key like "gallery:NSFW" into a safe DOM id fragment.
+  function cssSafe(key){
+    return String(key).replace(/[^a-zA-Z0-9_-]/g, '-');
+  }
+
+  function renderProfile(p){
+    return `
+      <div class="profile-top">
+        <div class="profile-photo-wrap">
+          ${p.couple_image ? `<img src="${esc(p.couple_image)}" alt="">` : ''}
+        </div>
+        <div>
+          <div class="stat-grid">
+            ${statRow('pronouns', p.pronouns)}
+            ${statRow('age', p.age)}
+            ${statRow('species', p.species)}
+            ${statRow('birthdate', p.birthdate)}
+            ${statRow('job(s)', p.jobs)}
+            ${statRow('origin city', p.origin_city)}
+            ${statRow('current location', p.current_location)}
+            ${statRow('deity', p.deity)}
+            ${statRow('alignment', p.alignment)}
+            ${statRow('sexuality', p.sexuality)}
+            ${statRow('status', p.status)}
+          </div>
+          <div class="taglist-row">
+            <span class="label">personality</span>
+            <div class="prose">${esc(val(p.personality))}</div>
+          </div>
+          ${tagBlock('likes', p.likes)}
+          ${tagBlock('dislikes', p.dislikes)}
+          ${tagBlock('hobbies', p.hobbies)}
+        </div>
+      </div>
+
+      <h2 class="section-heading">the features <span class="rule"></span></h2>
+      <div class="profile-top" style="grid-template-columns: 1fr 1fr;">
+        <div class="stat-grid">
+          ${statRow('height', p.height)}
+          ${statRow('weight', p.weight)}
+          ${statRow('build', p.build)}
+          ${statRow('eyes', p.eyes)}
+          ${statRow('hair', p.hair)}
+          ${statRow('scars', p.scars)}
+          ${statRow('languages', p.languages)}
+          ${statRow('ethnicity', p.ethnicity)}
+        </div>
+        <div class="taglist-row" style="margin-top:0;">
+          <span class="label">appearance</span>
+          <div class="prose">${esc(val(p.appearance))}</div>
+        </div>
+      </div>
+
+      ${(p.feature_image_1 || p.feature_image_2 || p.feature_image_3) ? `
+      <div class="gallery" style="margin-top:24px;">
+        ${p.feature_image_1 ? `<img src="${esc(p.feature_image_1)}" alt="">` : ''}
+        ${p.feature_image_2 ? `<img src="${esc(p.feature_image_2)}" alt="">` : ''}
+        ${p.feature_image_3 ? `<img src="${esc(p.feature_image_3)}" alt="">` : ''}
+      </div>` : ''}
+
+      <h2 class="section-heading">notes <span class="rule"></span></h2>
+      <div class="trio">
+        <div class="card"><span class="label">strengths</span><div class="prose">${esc(val(p.strengths))}</div></div>
+        <div class="card"><span class="label">weaknesses</span><div class="prose">${esc(val(p.weaknesses))}</div></div>
+        <div class="card"><span class="label">flaws</span><div class="prose">${esc(val(p.flaws))}</div></div>
+      </div>
+      ${p.additional_details ? `
+      <div class="card" style="margin-top:16px;">
+        <span class="label" style="font-size:0.68rem; letter-spacing:0.08em; text-transform:lowercase; color:var(--accent); display:block; margin-bottom:6px;">additional details</span>
+        <div class="prose">${esc(p.additional_details)}</div>
+      </div>` : ''}
+    `;
+  }
+
+  function renderMarkdown(text){
+    if (text === undefined || text === null || text === '') return '';
+    if (typeof marked !== 'undefined') {
+      try { return marked.parse(String(text)); }
+      catch (e) { /* fall through to plain text below */ }
+    }
+    return `<p>${esc(text)}</p>`;
+  }
+
+  function statRow(label, value){
+    return `<div class="stat"><span class="label">${esc(label)}</span><span class="value">${esc(val(value))}</span></div>`;
+  }
+  function tagBlock(label, value){
+    if(!value) return '';
+    const tags = String(value).split(',').map(s => s.trim()).filter(Boolean);
+    return `<div class="taglist-row">
+      <span class="label">${esc(label)}</span>
+      ${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+    </div>`;
+  }
+
+  function renderRelationships(list){
+    if(!list.length){
+      return `<div class="loading-msg">no relationships added yet.</div>`;
+    }
+    return `<div class="rel-grid">
+      ${list.map((r, i) => `
+        <div class="rel-card" data-index="${i}">
+          <img src="${esc(r.image_url || '')}" alt="" onerror="this.style.display='none'">
+          <div class="rel-body">
+            <span class="rel-name">${esc(val(r.name, 'unknown'))}</span>
+            ${r.pronouns ? `<span class="rel-pronouns">${esc(r.pronouns)}</span>` : ''}
+            ${r.label ? `<div class="tag" style="margin-top:6px;">${esc(r.label)}</div>` : ''}
+            <div class="rel-desc">${esc(val(r.description, ''))}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }
+
+  function wireRelationshipCards(list){
+    document.querySelectorAll('.rel-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const r = list[Number(card.dataset.index)];
+        openModal(r);
+      });
+    });
+  }
+
+  function renderGallery(group){
+    const isNSFW = group.name.trim().toLowerCase() === 'nsfw';
+    const gateId = `gate-${cssSafe(group.name)}`;
+
+    if (isNSFW && !revealedGalleries.has(group.name)) {
+      return `
+        <div class="gallery-gate" id="${esc(gateId)}">
+          <div class="gate-title">${esc(group.name)} <span class="crescent">☾</span></div>
+          <div class="gate-note">this gallery may contain mature content.</div>
+          <button class="gate-btn" data-reveal="${esc(group.name)}">show gallery</button>
+        </div>
+      `;
+    }
+
+    return `<div class="gallery">
+      ${group.images.map((img, i) => `
+        <figure class="gallery-figure" data-gallery="${esc(group.name)}" data-index="${i}">
+          <img src="${esc(img.image_url)}" alt="${esc(img.caption || '')}" loading="lazy" onerror="this.closest('.gallery-figure').style.display='none'">
+          ${img.caption ? `<div class="gallery-caption">${esc(img.caption)}</div>` : ''}
+        </figure>
+      `).join('')}
+    </div>`;
+  }
+
+  function wireGalleries(galleries){
+    // NSFW reveal gate
+    app.querySelectorAll('[data-reveal]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        revealedGalleries.add(btn.dataset.reveal);
+        const group = galleries.find(g => g.name === btn.dataset.reveal);
+        const panel = document.getElementById(`panel-${cssSafe(`gallery:${group.name}`)}`);
+        if (panel) panel.innerHTML = renderGallery(group);
+        wireGalleries(galleries);
+      });
+    });
+    // Click-to-enlarge images
+    app.querySelectorAll('.gallery-figure img').forEach(img => {
+      img.addEventListener('click', () => {
+        const fig = img.closest('.gallery-figure');
+        const group = galleries.find(g => g.name === fig.dataset.gallery);
+        const item = group && group.images[Number(fig.dataset.index)];
+        if (item) openImageModal(item);
+      });
+    });
+  }
+
+  function openImageModal(item){
+    const content = document.getElementById('modal-content');
+    content.innerHTML = `
+      <img class="lightbox-img" src="${esc(item.image_url)}" alt="${esc(item.caption || '')}">
+      ${item.caption ? `<div class="modal-desc">${esc(item.caption)}</div>` : ''}
+    `;
+    document.getElementById('modal-backdrop').classList.add('open');
+  }
+
+  // A Relationship Link value with no scheme and no slash is treated as a
+  // bare character slug and turned into an internal hub link. Anything
+  // else (a full URL, or an already-relative path) is used as typed.
+  function resolveRelationshipLink(value){
+    const v = String(value || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v) || v.includes('/')) return v;
+    return `character.html?c=${encodeURIComponent(v)}`;
+  }
+
+  function openModal(r){
+    const content = document.getElementById('modal-content');
+    const linkHref = resolveRelationshipLink(r.link_url);
+    content.innerHTML = `
+      ${r.image_url ? `<img src="${esc(r.image_url)}" alt="">` : ''}
+      <div class="rel-name" style="font-family:'Cormorant Garamond',serif; font-style:italic;">${esc(val(r.name,'unknown'))}
+        ${r.pronouns ? `<span class="rel-pronouns">${esc(r.pronouns)}</span>` : ''}
+      </div>
+      ${r.label ? `<div class="tag" style="margin-top:8px;">${esc(r.label)}</div>` : ''}
+      <div class="modal-desc">${esc(val(r.description,''))}</div>
+      ${linkHref ? `<a class="modal-link" href="${esc(linkHref)}" target="_blank" rel="noopener">visit their profile ↗</a>` : ''}
+    `;
+    document.getElementById('modal-backdrop').classList.add('open');
+  }
+  document.getElementById('modal-close').addEventListener('click', () => {
+    document.getElementById('modal-backdrop').classList.remove('open');
+  });
+  document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+    if(e.target.id === 'modal-backdrop') e.target.classList.remove('open');
+  });
+
+  function renderRules(p, rules){
+    return `
+      <div class="card contact-card">
+        ${p.profile_photo ? `<img src="${esc(p.profile_photo)}" alt="">` : ''}
+        <div>
+          <div class="contact-stats">
+            ${statRow('name', p.player_name)}
+            ${statRow('pronouns', p.player_pronouns)}
+            ${statRow('timezone', p.timezone)}
+            ${statRow('contact', p.contact)}
+            ${statRow('reply speed', p.reply_speed)}
+          </div>
+          ${p.intro_text ? `<div class="intro-text">${esc(p.intro_text)}</div>` : ''}
+        </div>
+      </div>
+
+      <h2 class="section-heading">rules <span class="rule"></span></h2>
+      ${rules.length ? `
+      <div class="rules-grid">
+        ${rules.map(r => `
+          <div class="card rule-card">
+            <div class="rule-title"><span class="crescent">☾</span>${esc(val(r.title))}</div>
+            <div class="rule-body">${renderMarkdown(r.body)}</div>
+          </div>
+        `).join('')}
+      </div>` : `<div class="loading-msg">no rules added yet.</div>`}
+    `;
+  }
+
+  function renderHooks(p){
+    return `
+      <h2 class="section-heading">hooks <span class="rule"></span></h2>
+      <div class="card">
+        <div class="rule-body">${renderMarkdown(p.hooks)}</div>
+      </div>
+    `;
+  }
+
+  // ---- Tabs ----
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(pnl => pnl.classList.remove('active'));
+      btn.classList.add('active');
+      const panel = document.getElementById(`panel-${activeTab}`);
+      if(panel) panel.classList.add('active');
+      window.scrollTo({top: 0, behavior:'smooth'});
+    });
+  });
+
+  loadHub();
+</script>
+</body>
+</html>
