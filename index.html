@@ -4,33 +4,285 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Game Character Hub</title>
-<link rel="stylesheet" href="style.css?v=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-a: #e6e6ea;
+    --bg-b: #d8d8de;
+    --card: #ffffff;
+    --ink: #18181b;
+    --muted: #6b7280;
+    --border: #e4e4e7;
+    --accent: #6366f1;
+    --accent-ink: #4338ca;
+    --pill-bg: #f4f4f5;
+    --shadow: rgba(24,24,27,0.08);
+    --radius: 16px;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background: linear-gradient(180deg, var(--bg-a), var(--bg-b));
+    color: var(--ink);
+    font-family:'Inter', system-ui, sans-serif;
+  }
+  .top-accent{ height:4px; background: var(--accent); }
+
+  header{
+    max-width:900px; margin:0 auto;
+    padding: 36px 24px 20px;
+    text-align:center;
+  }
+  .back-links{
+    display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+  .back-links a{
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:8px 16px;
+    font-size:0.85rem;
+    color: var(--ink);
+    text-decoration:none;
+    box-shadow: 0 1px 3px var(--shadow);
+  }
+  .back-links a:hover{ border-color: var(--accent); color: var(--accent-ink); }
+
+  .eyebrow{
+    font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase;
+    color: var(--muted); margin-bottom:8px; font-weight:600;
+  }
+  h1{
+    font-size: clamp(2rem, 5vw, 2.6rem);
+    font-weight:700; margin:0 0 10px;
+  }
+  .subtitle{ color: var(--muted); font-size:0.98rem; margin:0 0 22px; }
+
+  .owner-tabs{
+    display:flex; justify-content:center; gap:10px; margin-bottom:22px; flex-wrap:wrap;
+  }
+  .owner-tab{
+    appearance:none; cursor:pointer;
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--card);
+    border:1.5px solid var(--border);
+    border-radius:22px;
+    padding:9px 18px;
+    font-family:'Inter', sans-serif;
+    font-size:0.9rem; font-weight:500;
+    color: var(--muted);
+    box-shadow: 0 1px 3px var(--shadow);
+    transition: all 0.15s ease;
+  }
+  .owner-tab:hover{ color: var(--ink); }
+  .owner-tab.active{
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .search-wrap{ max-width:640px; margin: 0 auto 8px; padding: 0 24px; }
+  .search-input{
+    width:100%;
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:13px 20px;
+    font-family:'Inter', sans-serif;
+    font-size:0.95rem;
+    color: var(--ink);
+    box-shadow: 0 1px 3px var(--shadow);
+    outline:none;
+  }
+  .search-input:focus{ border-color: var(--accent); }
+  .search-input::placeholder{ color: #a1a1aa; }
+
+  main{ max-width:1100px; margin:0 auto; padding: 28px 24px 80px; }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap:20px;
+  }
+  .card{
+    background: var(--card);
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    overflow:hidden;
+    cursor:pointer;
+    text-decoration:none;
+    color:inherit;
+    display:block;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .card:hover{ transform: translateY(-3px); box-shadow: 0 12px 24px var(--shadow); }
+  .card .thumb{
+    width:100%; height:180px;
+    background: var(--pill-bg);
+    object-fit:cover; object-position: center 20%;
+    display:block;
+  }
+  .card .thumb-fallback{
+    width:100%; height:180px;
+    background: linear-gradient(135deg, var(--pill-bg), var(--border));
+    display:flex; align-items:center; justify-content:center;
+    font-size:2rem; font-weight:700; color: var(--muted);
+  }
+  .card .body{ padding: 12px 14px 16px; }
+  .card .name{ font-weight:600; font-size:1rem; margin-bottom:2px; }
+  .card .meta{ font-size:0.82rem; color: var(--muted); line-height:1.4; }
+  .card .badge{
+    display:inline-block; margin-top:8px;
+    background: var(--pill-bg);
+    border-radius:12px;
+    font-size:0.72rem;
+    padding:3px 10px;
+    color: var(--muted);
+  }
+
+  .empty-state, .loading-state{
+    text-align:center; color: var(--muted); padding: 60px 20px;
+  }
+</style>
 </head>
 <body>
 
-<header class="site-header">
-  <a class="back-link" href="https://characterhub.pages.dev/">← Back to StarSundae</a><br>
-   <a class="back-link" href="https://lunabrew.pages.dev/">← Back to LunaBrew</a>
-  <p class="eyebrow">Starbrew</p>
+<div class="top-accent"></div>
+
+<header>
+  <div class="back-links" id="back-links"></div>
+  <div class="eyebrow">Starbrew</div>
   <h1>Game Character Hub</h1>
   <p class="subtitle">A separate home for Luna and Star's video game characters.</p>
+  <div class="owner-tabs" id="owner-tabs"></div>
 </header>
 
-<main class="hub-shell">
-  <nav class="owner-tabs" aria-label="Character owner tabs">
-    <button class="owner-tab active" data-owner="Luna">🌙 Luna's Characters</button>
-    <button class="owner-tab" data-owner="Star">⭐ Star's Characters</button>
-  </nav>
+<div class="search-wrap">
+  <input type="text" class="search-input" id="search-input" placeholder="Search by name, game, race, or partner...">
+</div>
 
-  <section class="toolbar glass-card">
-    <input id="searchInput" type="search" placeholder="Search by name, game, race, or partner...">
-  </section>
-
-  <section id="statusMessage" class="status-message">Loading characters...</section>
-
-  <section id="characterGrid" class="character-grid"></section>
+<main id="grid">
+  <div class="loading-state">gathering the characters...</div>
 </main>
 
-<script src="script.js?v=1"></script>
+<script>
+  // ---- CONFIG ----
+const API_BASE = "https://testinggroundssb.crysthigpen.workers.dev";
+
+  // These are static site settings, not Notion-backed — edit here directly
+  // whenever the personal bio-link URLs change.
+  const BACK_LINKS = [
+    { label: "← Back to StarSundae", url: "https://starsundae.example.com" },
+    { label: "← Back to LunaBrew", url: "https://lunabrew.example.com" },
+  ];
+
+  const OWNER_ICONS = { luna: "☾", star: "★" };
+
+  const grid = document.getElementById('grid');
+  const ownerTabsEl = document.getElementById('owner-tabs');
+  const backLinksEl = document.getElementById('back-links');
+  const searchInput = document.getElementById('search-input');
+
+  let CHARACTERS = [];
+  let currentOwner = null;
+
+  function esc(str){
+    if(str === undefined || str === null || str === '') return '';
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderBackLinks(){
+    backLinksEl.innerHTML = BACK_LINKS.map(b => `<a href="${esc(b.url)}">${esc(b.label)}</a>`).join('');
+  }
+
+  async function loadHub(){
+    try{
+      const res = await fetch(`${API_BASE}/api/hub`);
+      if(!res.ok) throw new Error(`Request failed (${res.status})`);
+      const data = await res.json();
+      CHARACTERS = data.characters || [];
+
+      if(!CHARACTERS.length){
+        grid.innerHTML = `<div class="empty-state">no characters added yet.</div>`;
+        return;
+      }
+
+      const owners = [...new Set(CHARACTERS.map(c => c.profile?.owner).filter(Boolean))].sort();
+      const requestedOwner = new URLSearchParams(location.search).get('owner');
+      currentOwner = owners.includes(requestedOwner) ? requestedOwner : owners[0];
+
+      renderOwnerTabs(owners);
+      renderGrid();
+    }catch(err){
+      grid.innerHTML = `<div class="empty-state">the hub wouldn't load.<br><small>${esc(err.message)}</small></div>`;
+    }
+  }
+
+  function renderOwnerTabs(owners){
+    if(owners.length < 2){ ownerTabsEl.style.display = 'none'; return; }
+    ownerTabsEl.innerHTML = owners.map(o => {
+      const icon = OWNER_ICONS[o.toLowerCase()] || '•';
+      return `<button class="owner-tab${o === currentOwner ? ' active' : ''}" data-owner="${esc(o)}">${icon} ${esc(o)}'s Characters</button>`;
+    }).join('');
+    ownerTabsEl.querySelectorAll('.owner-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentOwner = btn.dataset.owner;
+        ownerTabsEl.querySelectorAll('.owner-tab').forEach(b => b.classList.toggle('active', b === btn));
+        const params = new URLSearchParams(location.search);
+        params.set('owner', currentOwner);
+        history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+        renderGrid();
+      });
+    });
+  }
+
+  function searchIndexFor(character){
+    const p = character.profile || {};
+    const relNames = (character.relationships || []).map(r => r.name || '').join(' ');
+    return [p.name, p.game, p.species, relNames].filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function renderGrid(){
+    const query = searchInput.value.trim().toLowerCase();
+
+    const visible = CHARACTERS.filter(c => {
+      const p = c.profile || {};
+      if ((p.owner || '') !== currentOwner) return false;
+      if (query && !searchIndexFor(c).includes(query)) return false;
+      return true;
+    });
+
+    if(!visible.length){
+      grid.innerHTML = `<div class="empty-state">no characters match.</div>`;
+      return;
+    }
+
+    grid.innerHTML = `<div class="grid">
+      ${visible.map(c => {
+        const p = c.profile || {};
+        const thumb = p.card_image || p.profile_photo || p.couple_image || p.banner_image;
+        const initial = (p.name || '?').trim()[0]?.toUpperCase() || '?';
+        return `<a class="card" href="character.html?c=${encodeURIComponent(c.slug)}&owner=${encodeURIComponent(p.owner || '')}">
+          ${thumb ? `<img class="thumb" src="${esc(thumb)}" alt="" onerror="this.outerHTML='<div class=&quot;thumb-fallback&quot;>${esc(initial)}</div>'">` : `<div class="thumb-fallback">${esc(initial)}</div>`}
+          <div class="body">
+            <div class="name">${esc(p.name || 'unnamed')}</div>
+            <div class="meta">${esc(p.species || '')}</div>
+            <div class="meta">${esc(p.game || '')}</div>
+            ${p.owner ? `<div class="badge">${esc(p.owner)}</div>` : ''}
+          </div>
+        </a>`;
+      }).join('')}
+    </div>`;
+  }
+
+  searchInput.addEventListener('input', renderGrid);
+
+  renderBackLinks();
+  loadHub();
+</script>
 </body>
 </html>
